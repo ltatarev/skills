@@ -1,9 +1,12 @@
 {
   "name": "adora",
-  "description": "Reusable skills for my React Native projects.",
+  "description": "React Native development skills — UI and module scaffolding, unit tests, validation and simulator verification, Unistyles and TrueSheet guides, iOS widgets and bootsplash — plus gitmoji commits, ticket shaping, Linear ticket implementation, and skill-library upkeep.",
   "version": "0.4.0",
   "author": {
     "name": "ltatarev"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": [
+    "mattpocock-skills@mattpocock"
+  ]
 }
