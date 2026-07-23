@@ -18,6 +18,7 @@ Claude Code as a plugin and in other Agent-Skills-compatible harnesses via
 `skills.sh`.
 
 ```bash
+/plugin marketplace add mattpocock/skills
 /plugin marketplace add ltatarev/skills
 /plugin install adora@adora-skills
 ```
@@ -77,7 +78,10 @@ infer.
 ### 🧩 As a Claude Code plugin — the whole bundle
 
 ```bash
-# register the marketplace once (name comes from marketplace.json)
+# adora depends on mattpocock-skills (see below) — add that marketplace first
+/plugin marketplace add mattpocock/skills
+
+# register this marketplace (name comes from marketplace.json)
 /plugin marketplace add ltatarev/skills
 
 # install the plugin
@@ -89,6 +93,12 @@ repo does. The plugin is the unit of installation — there is no per-skill
 picker at install time, and `skillOverrides` in settings does not apply to
 plugin skills. Manage them with `/plugin` (enable / disable / uninstall the
 plugin as a whole). Skills then resolve as `/adora:<skill-name>`.
+
+If you skip the first command you'll hit `Dependency
+"mattpocock-skills@mattpocock" ... not found` — `allowCrossMarketplaceDependenciesOn`
+in `marketplace.json` only permits the dependency, it doesn't register the
+marketplace for you, so that step can't be automated away (see
+[Relationship to mattpocock/skills](#-relationship-to-mattpocockskills)).
 
 To make a skill manual-only so Claude never auto-triggers it, add
 `disable-model-invocation: true` to its frontmatter. It stays callable as
