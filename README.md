@@ -14,6 +14,7 @@ skills/                           # the repo folder — name is irrelevant to th
     ├── add-feature/SKILL.md
     ├── bootsplash/                # + references/bootsplash-dark.mjs
     ├── build-ui/SKILL.md
+    ├── commit-changes/SKILL.md
     ├── gitmoji/                   # + references/gitmoji.json
     ├── implement-ticket/SKILL.md
     ├── ios-widget/                # + references/add-widget-target.rb
@@ -56,6 +57,7 @@ repo they run in rather than hardcoding one project's paths.
 | Skill | What it does |
 | ----- | ------------ |
 | `gitmoji` | Gitmoji commit format, with the canonical emoji list in `references/gitmoji.json`. |
+| `commit-changes` | Splits a messy working tree into small, meaningful commits — grouping by concern, hunk-level staging without interactive `git add -p`, and what never gets swept in. |
 | `ticket-shaping` | Turns a fuzzy UX-level idea into an implementation-ready ticket, via a one-question-at-a-time interview plus a plan you argue with. Writes to whichever tracker the repo configured. |
 | `implement-ticket` | Implements a ticket end-to-end: fetch, grill the plan, implement, test, mark In Review. Tracker (Linear, Notion, or in-repo `docs/tickets/`) is picked once per repo and stored in `.claude/ticket-tracker.json`. |
 | `maintain-skills` | Keeps this library and per-project `.claude/skills/` correct — drift checks, the promotion test for moving a project skill into this plugin, description quality bar. |
