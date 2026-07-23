@@ -50,6 +50,13 @@ That file is the canonical list of gitmojis for this skill. Each entry has:
 
 Do not rely on memory or the table below; always confirm against the JSON file.
 
+## Splitting a mixed working tree
+
+This skill covers the message only. When the working tree holds several
+unrelated concerns and needs to become more than one commit, follow
+`commit-changes` for the grouping and staging procedure and come back here for
+each message.
+
 ## Example
 
 Branch: `feature/JIRA-123-auth`
