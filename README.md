@@ -2,6 +2,11 @@
 
 # 💖 adora-skills
 
+![skills](https://img.shields.io/badge/skills-14-ff69b4?style=flat-square)
+![version](https://img.shields.io/badge/version-0.5.0-c084fc?style=flat-square)
+![claude code](https://img.shields.io/badge/Claude%20Code-v2.1.110+-d97757?style=flat-square)
+![license](https://img.shields.io/badge/license-MIT-64748b?style=flat-square)
+
 A Claude Code plugin marketplace of reusable agent skills for React Native
 work — building UI, scaffolding feature modules, writing tests, validating
 changes, iOS widgets, launch screens — plus a workflow set for commits, ticket
@@ -12,7 +17,12 @@ Skills are plain `SKILL.md` files. They follow the
 Claude Code as a plugin and in other Agent-Skills-compatible harnesses via
 `skills.sh`.
 
-## Works best with react-native-template
+```bash
+/plugin marketplace add ltatarev/skills
+/plugin install adora@adora-skills
+```
+
+## 🪄 Works best with react-native-template
 
 These skills encode the conventions of
 [`ltatarev/react-native-template`](https://github.com/ltatarev/react-native-template)
@@ -29,27 +39,31 @@ npx @react-native-community/cli@latest init MyApp \
 ```
 
 The template also ships an `AGENTS.md` / `CLAUDE.md` pair documenting those
-conventions, so agents get the project rules and these procedures together.
+conventions, so agents get the project rules and these procedures together. If
+you are not using the template, copy
+[`examples/react-native-AGENTS.md`](./examples/react-native-AGENTS.md) to your
+project root and edit it to match your codebase — the skills lean on a file
+like it being there.
 
 They are not exclusive to it — every skill reads the repo it runs in before
 acting (see below), so they work in any React Native codebase with a similar
 shape. The closer your project is to the template, the less the agent has to
 infer.
 
-## Design principles
+## 🧭 Design principles
 
-- **Read the repo, don't assume it.** Every skill starts by grounding itself in
-  the project it runs in — theme tokens, barrel exports, script names, Jest
+- 🔍 **Read the repo, don't assume it.** Every skill starts by grounding itself
+  in the project it runs in — theme tokens, barrel exports, script names, Jest
   config — rather than hardcoding one codebase's paths. Conventions differ; the
   procedures don't.
-- **Encode the traps.** The value is in the failure modes: the `*.test.ts`-only
+- 🪤 **Encode the traps.** The value is in the failure modes: the `*.test.ts`-only
   `testMatch` that silently skips your `.test.tsx`, the `StyleSheet` import that
   breaks theming, the persisted slice that ships `file://` paths to another
   device.
-- **Say what "done" means.** Each skill ends with a definition of done you can
+- ✅ **Say what "done" means.** Each skill ends with a definition of done you can
   check, not vibes.
 
-## Requirements
+## 📦 Requirements
 
 - [Claude Code](https://claude.com/claude-code) v2.1.110+ for plugin
   dependencies (earlier versions can still install the plugin, without the
@@ -58,9 +72,9 @@ infer.
   (`add-widget-target.rb`, `bootsplash-dark.mjs`) are invoked only by the
   skills that carry them.
 
-## Install
+## ⚡ Install
 
-### As a Claude Code plugin — the whole bundle
+### 🧩 As a Claude Code plugin — the whole bundle
 
 ```bash
 # register the marketplace once (name comes from marketplace.json)
@@ -80,7 +94,7 @@ To make a skill manual-only so Claude never auto-triggers it, add
 `disable-model-invocation: true` to its frontmatter. It stays callable as
 `/adora:<skill-name>` but its description is kept out of context.
 
-### Via skills.sh — pick individual skills
+### 🎛️ Via skills.sh — pick individual skills
 
 ```bash
 npx skills@latest add ltatarev/skills
@@ -114,15 +128,15 @@ To make a project auto-prompt teammates to install it, add to that project's
 }
 ```
 
-### Updating
+### 🔄 Updating
 
 ```bash
 /plugin marketplace update adora-skills
 ```
 
-## The skills
+## 🗂️ The skills
 
-**React Native**
+**📱 React Native**
 
 | Skill | What it does |
 | ----- | ------------ |
@@ -134,14 +148,14 @@ To make a project auto-prompt teammates to install it, add to that project's
 | `unistyles` | `react-native-unistyles` guide, with the full v3 docs vendored offline in `references/`. |
 | `truesheet-usage` | Consumer guide for `@lodev09/react-native-true-sheet` bottom sheets. |
 
-**Native**
+**🍏 Native**
 
 | Skill | What it does |
 | ----- | ------------ |
 | `ios-widget` | WidgetKit extensions: the App Group snapshot architecture, scripting the extension target into `project.pbxproj`, the Swift bridge, offscreen Skia rendering, dark mode, and the build-verification traps. Carries a parameterized `add-widget-target.rb`. |
 | `bootsplash` | Launch screen across all three surfaces (iOS storyboard, Android night resources, JS overlay), including dark variants without `react-native-bootsplash`'s paid license key. Carries the `bootsplash-dark.mjs` that generates them. |
 
-**Workflow**
+**🔁 Workflow**
 
 | Skill | What it does |
 | ----- | ------------ |
@@ -153,14 +167,14 @@ To make a project auto-prompt teammates to install it, add to that project's
 
 The React Native skills assume a package-by-feature codebase (`src/modules/`
 with barrel exports, Redux Toolkit, Unistyles, i18n) — see
-[Works best with react-native-template](#works-best-with-react-native-template).
+[Works best with react-native-template](#-works-best-with-react-native-template).
 
 Deliberately **not** here: skills that only make sense in a single repo (a
 codebase orientation map, a sync/merge guardrail, an in-app-purchase
 guardrail). Those belong in that project's `.claude/skills/`.
 `maintain-skills` describes the promotion test for deciding which is which.
 
-## Relationship to mattpocock/skills
+## 🤝 Relationship to mattpocock/skills
 
 `adora` declares a real dependency on
 [`mattpocock/skills`](https://github.com/mattpocock/skills), so installing
@@ -188,7 +202,7 @@ That plugin also ships `code-review`, `diagnosing-bugs`, `tdd`, `wayfinder`,
 React Native-specific skills here. Where they overlap, those are the
 language-agnostic version and these encode the house conventions.
 
-## Repo layout
+## 🏗️ Repo layout
 
 ```text
 .
@@ -224,7 +238,7 @@ serve **both** install paths above — nesting them under
 `plugins/<name>/skills/` would still work for the plugin, but hides them from
 the skills.sh installer.
 
-### Three names
+### 🏷️ Three names
 
 None of them has to match the others:
 
@@ -238,7 +252,7 @@ Together they make `/plugin install adora@adora-skills`. Renaming the repo
 changes nothing; renaming the **marketplace** after publishing breaks existing
 installs, since `@adora-skills` is what users record in their settings.
 
-## Contributing
+## 🙌 Contributing
 
 Issues and pull requests are welcome — especially fixes to a skill that steered
 an agent wrong in your repo, and new traps worth encoding.
@@ -257,7 +271,9 @@ Adding a skill:
    ```
 
 2. Run `claude plugin validate .`.
-3. Bump `version` in `.claude-plugin/plugin.json` and the marketplace entry.
+3. Bump `version` in `.claude-plugin/plugin.json` **and** the marketplace entry
+   — they have to agree. The `skills` and `version` badges at the top of this
+   README are static; nudge them too.
 
 The bar for a skill: the description states both *what* and *when* (that string
 is all the model sees when deciding to load it), the body grounds itself in the
@@ -267,7 +283,7 @@ Long reference material goes in `references/` so it loads only when needed.
 Anything larger than a fix — run `maintain-skills`, which encodes the drift
 checks and the quality bar this library is held to.
 
-## Forking this as your own marketplace
+## 🍴 Forking this as your own marketplace
 
 Fork, then edit the two manifests: `name`/`owner` in
 `.claude-plugin/marketplace.json`, and `name` in `.claude-plugin/plugin.json`.
@@ -280,7 +296,7 @@ plugins installable independently, that root-as-plugin layout can't express it
 folder. That takes the skills out of skills.sh's reach, trading per-skill
 selection for per-plugin selection.
 
-### Indexing someone else's plugin
+### 🔗 Indexing someone else's plugin
 
 A marketplace only indexes plugins, so a plugin can live in someone else's
 repo. Add an entry to `plugins` whose `source` points elsewhere, and **pin a
@@ -329,7 +345,7 @@ shapes immediately.
 > (latest) — a deliberate trade of review-before-adopt for staying current. Pin
 > a `sha` on a re-listed entry if you'd rather review each update.
 
-## Docs
+## 📚 Docs
 
 - [Create & distribute a marketplace](https://code.claude.com/docs/en/plugin-marketplaces)
 - [Plugin dependencies](https://code.claude.com/docs/en/plugin-dependencies)
