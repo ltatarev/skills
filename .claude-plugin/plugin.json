@@ -1,7 +1,7 @@
 {
   "name": "adora",
   "description": "React Native development skills — UI and module scaffolding, unit tests, validation and simulator verification, Unistyles and TrueSheet guides, iOS widgets, bootsplash and Xcode Cloud CI — plus gitmoji commits, splitting a messy tree into meaningful commits, ticket shaping, Linear ticket implementation, and skill-library upkeep.",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": {
     "name": "ltatarev"
   },

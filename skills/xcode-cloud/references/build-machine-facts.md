@@ -34,14 +34,17 @@ _Observed 24.07.2026 · Xcode 26.5 · RN 0.86_
 | --- | --- |
 | Architecture | **x86_64** — `/usr/local/Cellar`, not `/opt/homebrew` |
 | Homebrew | present; its `ruby` formula is **already installed and linked** |
-| Node | **absent** — must be installed |
+| Node | **absent** — must be installed. `brew install node@NN` for the *current* major resolves through an alias to the unversioned `node`, which is **not** keg-only; only older majors are real keg-only formulae |
+| corepack | **absent, and node does not supply it** — node 25 dropped it from the distribution. It is a separate Homebrew formula, and that formula links only `corepack`; `yarn`/`pnpm` shims appear only after `corepack enable` |
 | CocoaPods | **1.17.0 preinstalled** — `brew install cocoapods` is a no-op, worth keeping so the script does not depend on the preinstall |
 | Caching | **none** — every run reinstalls everything, ~2–3 min |
 | Working directory | the script starts in `ios/ci_scripts`, **not** the repo root |
 | Repo path | `$CI_PRIMARY_REPOSITORY_PATH` = `/Volumes/workspace/repository` |
 | Xcode | 26.5 (a *newer* Xcode locally is normal — see the exit-65 entry in `failure-catalogue.md`) |
 
-_History: nothing superseded yet — this is the first recorded observation._
+_History: nothing superseded yet. The node and corepack rows were sharpened
+24.07.2026 after a build died on `corepack: command not found` — the earlier
+"Node absent" row was true but incomplete, which was enough to cost a build._
 
 ## Rules that follow from the environment
 

@@ -34,7 +34,12 @@ export HOMEBREW_NO_ENV_HINTS=1
 export LANG=en_US.UTF-8
 
 echo "--- Toolchain"
-brew install "$NODE_FORMULA" cocoapods
+# corepack is its own formula because node 25 dropped it from the distribution —
+# node alone gets you "corepack: command not found" the moment yarn is needed.
+# The formula links only corepack itself; the yarn shim comes from the
+# `corepack enable` below, so both steps are load-bearing. Only drop it if the
+# repo is on npm and never invokes corepack.
+brew install "$NODE_FORMULA" corepack cocoapods
 export PATH="$(brew --prefix "$NODE_FORMULA")/bin:$PATH"
 node --version
 pod --version

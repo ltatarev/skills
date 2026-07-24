@@ -64,6 +64,37 @@ printf 'export NODE_BINARY=%s\n' "$(command -v node)" > "$IOS_DIR/.xcode.env.loc
 Generalise the lesson: **anything the build phases need must be written to a
 file, never exported.**
 
+## `corepack: command not found` during install
+
+```
+ci_post_clone.sh: line 52: corepack: command not found
+Command exited with non-zero exit-code: 127
+```
+
+Node installed cleanly and printed its version two lines earlier, which is what
+makes this read as a PATH problem. It is not. **Node 25 removed corepack from
+the distribution** — deprecated in 24, unbundled in 25 — so any build image on
+node 25 or newer has node, npm, and no corepack at all. A laptop that still
+works is one that got corepack from somewhere else; on Homebrew that is the
+separate `corepack` formula, which is easy to forget you ever installed.
+
+Install it as its own formula alongside node:
+
+```sh
+brew install "$NODE_FORMULA" corepack cocoapods
+```
+
+**Both the install and `corepack enable` are load-bearing.** The formula links
+only `corepack` itself — the `yarn` and `pnpm` shims are created by
+`corepack enable`, so installing the formula and then calling `yarn` directly
+still fails.
+
+Do not reach for `brew install yarn` instead: that formula is yarn **1.x**, and
+a repo with `packageManager: yarn@4.x` needs corepack to fetch the pinned
+version. If corepack itself ever goes away, the escape hatch is committing a
+yarn release under `.yarn/releases/` and setting `yarnPath` in `.yarnrc.yml`,
+which removes the dependency entirely.
+
 ## `Error: async hook stack has become corrupted` during install
 
 ```
