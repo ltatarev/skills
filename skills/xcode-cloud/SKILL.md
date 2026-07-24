@@ -145,6 +145,13 @@ the user through it rather than pretending to do it.
 - Scheme: the **shared** one from Phase 0.
 - Start condition: usually branch changes on the release branch. Note that Xcode
   Cloud only builds **pushed** commits.
+- **Files and Folders**, under the branch-changes condition, keeps prose commits
+  from burning an archive: set the dropdown to *Don't Start a Build* and add
+  `docs/` or equivalent. It excludes, so a commit touching both docs and source
+  still builds — it cannot silently swallow a real change, unlike an include
+  list. The complement is `ci skip` anywhere in a commit message, which makes
+  Xcode Cloud ignore that push entirely and covers the stray files no folder
+  condition can.
 - Action **Archive**, and *Deployment Preparation* = **App Store Connect and
   TestFlight** if the build is meant to reach testers. `Development` or
   `Testing` produces a downloadable artifact and uploads nothing.
