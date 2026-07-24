@@ -155,6 +155,61 @@ for both the prefetch retries and pod install, re-running the build is still the
 move. If a future RN adds a fifth artifact, add one entry to the `for artifact
 in` loop — URL and cache filename are both `reactnative-<artifact>-<ver>-<type>`.
 
+Hermes is a **fifth and sixth** download that the four-artifact loop misses:
+same shared cache, different coordinate
+(`<maven>/com/facebook/hermes/hermes-ios/<ver>/hermes-ios-<ver>-hermes-ios-<type>.tar.gz`,
+cached as `hermes-ios-<ver>-<type>.tar.gz`), same bare curl, this time in
+`sdks/hermes-engine/hermes-utils.rb`. Its version is **not** RN's: the podspec
+reads `sdks/hermes-engine/version.properties` and takes `HERMES_V1_VERSION_NAME`
+unless `RCT_HERMES_V1_ENABLED=0`, in which case `HERMES_VERSION_NAME`. Read that
+file rather than hardcoding — on RN 0.86.0 the two are `250829098.0.14` and
+`0.17.0`, and only the first appears in the URL. Prefetching is safe: a cached
+tarball that fails RN's SHA1 check is deleted and re-downloaded, not fatal.
+
+## `Couldn't determine repo type for URL: https://cdn.cocoapods.org/`
+
+```
+[!] Couldn't determine repo type for URL: `https://cdn.cocoapods.org/`: Connection reset by peer - SSL_connect
+[!] Do not use "pod install" from inside Rosetta2 (x86_64 emulation on arm64).
+```
+
+The Rosetta advice underneath is the same **red herring** that follows the
+`curl: (35)` failure above, and it means nothing here either. The real event is
+a TLS reset talking to the CocoaPods CDN.
+
+Why that one call is so fragile: `Pod::Source::Manager` only reaches for the
+network when no local repo already claims the URL. Then `create_source_with_url`
+calls `cdn_url?`, which fetches `https://cdn.cocoapods.org/CocoaPods-version.yml`
+through **one bare `OpenURI` call with no retry**, purely to decide whether the
+URL is a CDN or a git repo. A fresh Xcode Cloud runner has no `~/.cocoapods` at
+all, so every build makes that call, and a single reset aborts the archive.
+Everything the CDN source fetches *after* that point retries five times with
+backoff (`COCOAPODS_CDN_MAX_NUMBER_OF_RETRIES`) — the probe is the one
+unprotected step, which is why this fails before "Analyzing dependencies" gets
+anywhere.
+
+Create the repo before `pod install` and the probe never runs, because the
+source is then found by URL. That is all `pod repo add-cdn trunk` writes:
+
+```bash
+CP_TRUNK_DIR="$HOME/.cocoapods/repos/trunk"
+mkdir -p "$CP_TRUNK_DIR"
+printf 'https://cdn.cocoapods.org/' > "$CP_TRUNK_DIR/.url"
+```
+
+A directory named `trunk` becomes a `TrunkSource`; any other name with a `.url`
+file becomes a `CDNSource`. Seeding `CocoaPods-version.yml` beside it with a
+retrying curl saves one more round trip but is not what fixes this.
+
+Check whether the repo needs the CDN at all before going further — `SPEC REPOS`
+in `Podfile.lock` lists every pod that is not path-based. It is often a single
+transitive dependency (for RN apps with `react-native-mmkv`, `MMKVCore`), and
+that one line is the whole reason the archive touches the network here.
+
+Beyond this, wrap `pod install` itself in two or three attempts. It is
+idempotent, and the hardening above only covers the fetches that are already
+known to be unprotected.
+
 ## `bigdecimal` fails to compile / `rb_complex_real` redeclaration
 
 ```
