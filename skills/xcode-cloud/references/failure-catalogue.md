@@ -376,24 +376,32 @@ marketing version. The RN template hardcodes `CURRENT_PROJECT_VERSION = 1` in
 every configuration, which survives exactly one upload. Stamp `$CI_BUILD_NUMBER`
 over all of them in `ci_pre_xcodebuild.sh`.
 
-**`$CI_BUILD_NUMBER` alone is not enough on an app that already shipped.** The
-counter is per Xcode Cloud product, starts at 1, counts failed builds, and knows
-nothing about anything uploaded before — Xcode, Transporter, Fastlane. An app
-already on build 8 gets a cloud build numbered 1, which TestFlight rejects
-because build numbers must *increase* within a marketing version, not merely be
-unique. Ask what the highest build in App Store Connect is before writing the
-script, and add a constant offset:
+**That stamp does not reach TestFlight, and on an app that already shipped it is
+not the number that matters.** Two separate facts, and the second one bites:
 
-```bash
-BUILD_NUMBER_OFFSET=8    # highest build already uploaded by hand
-BUILD_NUMBER=$((CI_BUILD_NUMBER + BUILD_NUMBER_OFFSET))
-```
+Xcode Cloud's counter is per product, starts at 1, counts failed builds, and
+knows nothing about anything uploaded before it existed — Xcode, Transporter,
+Fastlane. An app already on build 8 gets a cloud build numbered 1, and TestFlight
+refuses it: build numbers must *increase* within a marketing version, not merely
+be unique.
 
-The offset only ever goes up, and it does not reset when `MARKETING_VERSION` is
-bumped — numbers may keep climbing across versions. The self-correcting version
-of this queries the App Store Connect API for the latest build and adds one, but
-that needs an API key, secret environment variables on the workflow and JWT
-signing in the script; for a single-target app the constant is the better trade.
+The instinct is to fix that in the repo — a constant offset, a computed number, a
+commit count stamped into `project.pbxproj`. **None of it works for a build
+distributed to App Store Connect.** Xcode Cloud writes its own
+`exportOptions.plist` using `CI_BUILD_NUMBER` and rewrites the build number at
+export, so whatever the script wrote is overwritten on the way out. The archive
+goes green, TestFlight shows the cloud counter, and the workaround looks like it
+silently did nothing — because it did.
+
+The only place to change it is **App Store Connect → Xcode Cloud → Settings →
+Build Number**, which sets the *next* build number and auto-increments from
+there. Set it once, past the highest build already uploaded by hand. There is no
+documented way to make Xcode Cloud read `CFBundleVersion` instead
+([forums/683890](https://developer.apple.com/forums/thread/683890)).
+
+Keep stamping `$CI_BUILD_NUMBER` in `ci_pre_xcodebuild.sh` anyway: it is what
+keeps a *local* or manual archive off the template's hardcoded `1`. Just do not
+expect it to control TestFlight, and do not build repo-side logic on top of it.
 
 ## Every build lands in "Missing Compliance"
 
