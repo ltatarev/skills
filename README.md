@@ -164,6 +164,7 @@ To make a project auto-prompt teammates to install it, add to that project's
 | ----- | ------------ |
 | `ios-widget` | WidgetKit extensions: the App Group snapshot architecture, scripting the extension target into `project.pbxproj`, the Swift bridge, offscreen Skia rendering, dark mode, and the build-verification traps. Carries a parameterized `add-widget-target.rb`. |
 | `bootsplash` | Launch screen across all three surfaces (iOS storyboard, Android night resources, JS overlay), including dark variants without `react-native-bootsplash`'s paid license key. Carries the `bootsplash-dark.mjs` that generates them. |
+| `xcode-cloud` | Xcode Cloud CI for an RN app: the `ci_post_clone.sh` / `ci_pre_xcodebuild.sh` templates, workflow and TestFlight prerequisites, and a symptom-indexed failure catalogue. Self-documenting — every newly diagnosed failure is routed back into the catalogue or the project's own doc. |
 
 **🔁 Workflow**
 
@@ -233,7 +234,8 @@ language-agnostic version and these encode the house conventions.
     ├── unistyles/          # + references/unistyles.md (full offline docs)
     ├── validate-change/SKILL.md
     ├── verify/SKILL.md
-    └── write-tests/SKILL.md
+    ├── write-tests/SKILL.md
+    └── xcode-cloud/        # + references/ci_*.sh, failure-catalogue.md
 ```
 
 - **Marketplace** = the catalog (this repo). It *indexes* plugins; it doesn't
