@@ -376,6 +376,25 @@ marketing version. The RN template hardcodes `CURRENT_PROJECT_VERSION = 1` in
 every configuration, which survives exactly one upload. Stamp `$CI_BUILD_NUMBER`
 over all of them in `ci_pre_xcodebuild.sh`.
 
+**`$CI_BUILD_NUMBER` alone is not enough on an app that already shipped.** The
+counter is per Xcode Cloud product, starts at 1, counts failed builds, and knows
+nothing about anything uploaded before — Xcode, Transporter, Fastlane. An app
+already on build 8 gets a cloud build numbered 1, which TestFlight rejects
+because build numbers must *increase* within a marketing version, not merely be
+unique. Ask what the highest build in App Store Connect is before writing the
+script, and add a constant offset:
+
+```bash
+BUILD_NUMBER_OFFSET=8    # highest build already uploaded by hand
+BUILD_NUMBER=$((CI_BUILD_NUMBER + BUILD_NUMBER_OFFSET))
+```
+
+The offset only ever goes up, and it does not reset when `MARKETING_VERSION` is
+bumped — numbers may keep climbing across versions. The self-correcting version
+of this queries the App Store Connect API for the latest build and adds one, but
+that needs an API key, secret environment variables on the workflow and JWT
+signing in the script; for a single-target app the constant is the better trade.
+
 ## Every build lands in "Missing Compliance"
 
 Declare `ITSAppUsesNonExemptEncryption` in the app's `Info.plist`. Without it,
