@@ -410,3 +410,34 @@ each build sits in "Missing Compliance" and cannot reach testers until the
 question is answered by hand, one build at a time. `false` is correct for an app
 using only standard HTTPS, which is exempt — revisit if it ever ships its own
 cryptography.
+
+## A green archive ships with an API key silently empty (react-native-config)
+
+Nothing errors. The archive is green, TestFlight gets the build, and whatever
+the app does with the missing key just quietly doesn't work — a blank feed, a
+login that never succeeds, a fetch that always fails. Grep the build log for
+`Missing .env file` to confirm this is it.
+
+`react-native-config` does not read the process environment. Its CocoaPods
+script phase (`BuildDotenvConfig.rb`, wired in by the pod's own `script_phase`,
+not by anything hand-added to `project.pbxproj`) reads a literal `.env` file
+from the repo root at build time, and a missing file is a **warning, not a
+failure** — it falls back to an empty config and the build proceeds. `.env` is
+gitignored in essentially every RN project, so Xcode Cloud's clone never has
+one, and setting the key as a Shared Environment Variable on the workflow does
+not fix it — that only makes the value visible to the `ci_scripts` shells, not
+to the pod's script phase.
+
+The fix is to have `ci_post_clone.sh` write the file the pod actually reads,
+from the value Xcode Cloud actually gave it:
+
+```sh
+: "${MY_API_KEY:?MY_API_KEY is not set — add it as a Shared Environment Variable on the Xcode Cloud workflow}"
+printf 'MY_API_KEY=%s\n' "$MY_API_KEY" > "$REPO_ROOT/.env"
+```
+
+Do this before anything else runs in the script, and let `:?` abort the build
+loudly if the variable is unset — the whole failure mode here is that a missing
+value is silent by default at three different layers (Xcode Cloud, the script
+phase, the app's own fallback-to-empty-string reads), so the one layer under
+this repo's control should not add a fourth.
