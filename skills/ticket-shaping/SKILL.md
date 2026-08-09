@@ -7,12 +7,12 @@ description: >
   recommended implementation plan the user challenges before it is
   written down. The user describes how something should behave and look, NOT
   the technical approach; this skill interviews them one question at a time,
-  drafts the plan, hands it to `grilling`, then writes the ticket(s). Trigger
+  drafts the plan, hands it to `grill-plan`, then writes the ticket(s). Trigger
   when the user says "shape this", "write a ticket", "let's spec", "I want the
   app to…", "it should feel like…", "turn this idea into a task", or describes
   desired behavior/looks and asks to capture it for later implementation. NOT
-  for stress-testing an already-written plan (that's `grilling` on its own) and
-  NOT for actually building the feature.
+  for stress-testing an already-written plan (that's `grill-plan` on its own)
+  and NOT for actually building the feature.
 ---
 
 # Ticket Shaping
@@ -149,12 +149,12 @@ rather than literals, i18n for all user-facing text, adapters instead of direct
 native SDK use, `FlatList` for long lists, `scheduleOnRN` rather than `runOnJS`.
 If the plan needs an exception to any of them, say so explicitly rather than
 quietly breaking it. If it contradicts an ADR in `docs/adr/`, flag that the
-ticket also needs a new ADR — invoke `domain-modeling` when it does.
+ticket also needs a new ADR — invoke `domain-model` when it does.
 
 ### 5. Present, then get grilled
 
 Show the user the drafted ticket in full — UX sections and plan together — then
-invoke the `grilling` skill on the **plan** specifically. One question per
+invoke the `grill-plan` skill on the **plan** specifically. One question per
 turn, each with your recommended answer, until the user is satisfied. Expect
 the plan to change; expect some answers to reach back and change the UX
 sections too. Rewrite the draft in place after each round rather than

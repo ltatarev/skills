@@ -21,7 +21,7 @@ it through an App Group.
 **Do (b).** Reimplementing means two implementations of the same visual kept in
 sync by hand forever, plus forcing the database into the App Group. Record the
 choice as an ADR — it is architectural, hard to reverse, and surprising without
-context. Use `domain-modeling` for that.
+context. Use `domain-model` for that.
 
 ## The shape of it
 

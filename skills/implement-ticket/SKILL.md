@@ -64,10 +64,10 @@ Load MCP tools via ToolSearch if they are deferred.
 
 ## 4. Grill the plan before writing code
 
-Do not start implementing straight from the ticket. First sketch the approach you intend to take (files you will touch, the shape of the change, and the open questions from step 2), then invoke the `grill-with-docs` skill with the Skill tool to stress-test it with the user. (It ships with the `mattpocock-skills` plugin, which `adora` depends on; if it is not installed, fall back to interviewing the user one question at a time, always offering your recommended answer.)
+Do not start implementing straight from the ticket. First sketch the approach you intend to take (files you will touch, the shape of the change, and the open questions from step 2), then invoke the `grill-plan` skill with the Skill tool to stress-test it with the user.
 
 - Feed the grilling session your proposed approach plus the ticket's acceptance criteria, so it interviews against a concrete plan rather than a blank page.
-- Let the session run to its conclusion — it also records ADRs and glossary entries, which are part of the ticket's output.
+- Let the session run to its conclusion, capturing as it goes — the ADRs and glossary entries it records via `domain-model` are part of the ticket's output.
 - Carry the decisions that come out of it into the implementation. If grilling changes the scope or the approach, use the revised version, not your original sketch.
 - Skip this step only if the user explicitly says to skip the grilling (e.g. "no grilling", "just implement it").
 

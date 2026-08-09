@@ -25,7 +25,7 @@ Read the repo before scaffolding — module conventions drift between projects.
    That is your template; copy its shape rather than this skill's.
 2. Read `AGENTS.md` / `CLAUDE.md` for the conventions and non-negotiables.
 3. Read `CONTEXT.md` if present for the domain vocabulary — use its terms
-   exactly, and the `domain-modeling` skill if you are introducing new ones.
+   exactly, and the `domain-model` skill if you are introducing new ones.
 4. Read the root store file to see how reducers are registered and what the
    persist config actually persists.
 

@@ -24,7 +24,7 @@ Work out the target before editing anything — they have different rules.
 | --- | --- | --- |
 | **Shared skills** (this plugin) | the `adora-skills` repo, `skills/<name>/SKILL.md` | Must stay **project-agnostic**. No repo-specific paths, baselines, bundle ids, or module names. Teach Claude to *read* the specifics from the repo it is in. |
 | **Project skills** | `<project>/.claude/skills/` | May be as concrete as you like — cite real paths, real symbols, real baselines. Concreteness is the point. |
-| **Third-party skills** | installed plugins (e.g. `mattpocock-skills`) | Read-only. Never edit; if one is wrong, note it and work around it. |
+| **Third-party skills** | other installed plugins' `skills/` | Read-only. Never edit; if one is wrong, note it and work around it. |
 
 Plugin skills are installed as a read-only bundle. To change one, edit it in the
 `adora-skills` repo, push, and run `/plugin marketplace update adora-skills`.
@@ -110,11 +110,11 @@ project specific that should be removed or turned into "read this from the repo"
 installed plugin already covers it — duplicating a dependency's skill means two
 descriptions competing for the same trigger, and the worse one sometimes wins.
 
-## CONTEXT.md and ADR changes route through domain-modeling
+## CONTEXT.md and ADR changes route through domain-model
 
 Skills consume the domain model; they do not own it. When maintenance reveals
 that terminology or a decision itself is wrong or missing, do not edit
-`CONTEXT.md` or `docs/adr/` ad hoc from here — run `domain-modeling` to change
+`CONTEXT.md` or `docs/adr/` ad hoc from here — run `domain-model` to change
 the model. After the model changes, re-sync every skill that uses the affected
 terms: `grep -rln '<term>'` to find them, then drift-check each. The dependency
 is one-way: model first, skills follow.
@@ -145,7 +145,7 @@ load a skill. A smaller model must fire on it from a vague user message.
   discarded on the next update. Edit the source repo.
 - **Never leak project specifics into a shared skill.** A hardcoded module name
   or bundle id teaches the wrong thing in every other project.
-- **Do not edit CONTEXT.md or ADRs from here** — route through `domain-modeling`.
+- **Do not edit CONTEXT.md or ADRs from here** — route through `domain-model`.
 - **Do not let skills restate CLAUDE.md / AGENTS.md** — duplication drifts
   independently and the copies will disagree.
 - **Do not delete a skill without removing cross-references** — sibling skills
