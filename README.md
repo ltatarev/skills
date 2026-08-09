@@ -2,15 +2,16 @@
 
 # 💖 adora-skills
 
-![skills](https://img.shields.io/badge/skills-14-ff69b4?style=flat-square)
-![version](https://img.shields.io/badge/version-0.5.0-c084fc?style=flat-square)
-![claude code](https://img.shields.io/badge/Claude%20Code-v2.1.110+-d97757?style=flat-square)
+![skills](https://img.shields.io/badge/skills-17-ff69b4?style=flat-square)
+![version](https://img.shields.io/badge/version-0.7.0-c084fc?style=flat-square)
+![claude code](https://img.shields.io/badge/Claude%20Code-plugin-d97757?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-64748b?style=flat-square)
 
 A Claude Code plugin marketplace of reusable agent skills for React Native
 work — building UI, scaffolding feature modules, writing tests, validating
-changes, iOS widgets, launch screens — plus a workflow set for commits, ticket
-shaping, and ticket implementation.
+changes, iOS widgets, launch screens — plus a workflow set for grilling a plan,
+keeping the domain model honest, commits, ticket shaping, and ticket
+implementation.
 
 Skills are plain `SKILL.md` files. They follow the
 [Agent Skills](https://code.claude.com/docs/en/skills) format, so they work in
@@ -18,7 +19,6 @@ Claude Code as a plugin and in other Agent-Skills-compatible harnesses via
 `skills.sh`.
 
 ```bash
-/plugin marketplace add mattpocock/skills
 /plugin marketplace add ltatarev/skills
 /plugin install adora@adora-skills
 ```
@@ -66,9 +66,9 @@ infer.
 
 ## 📦 Requirements
 
-- [Claude Code](https://claude.com/claude-code) v2.1.110+ for plugin
-  dependencies (earlier versions can still install the plugin, without the
-  dependency resolution).
+- [Claude Code](https://claude.com/claude-code), any version with plugin
+  marketplace support. `adora` declares no plugin dependencies, so nothing has
+  to be registered before it.
 - Nothing else. The skills are markdown; the two scripted references
   (`add-widget-target.rb`, `bootsplash-dark.mjs`) are invoked only by the
   skills that carry them.
@@ -78,9 +78,6 @@ infer.
 ### 🧩 As a Claude Code plugin — the whole bundle
 
 ```bash
-# adora depends on mattpocock-skills (see below) — add that marketplace first
-/plugin marketplace add mattpocock/skills
-
 # register this marketplace (name comes from marketplace.json)
 /plugin marketplace add ltatarev/skills
 
@@ -94,11 +91,9 @@ picker at install time, and `skillOverrides` in settings does not apply to
 plugin skills. Manage them with `/plugin` (enable / disable / uninstall the
 plugin as a whole). Skills then resolve as `/adora:<skill-name>`.
 
-If you skip the first command you'll hit `Dependency
-"mattpocock-skills@mattpocock" ... not found` — `allowCrossMarketplaceDependenciesOn`
-in `marketplace.json` only permits the dependency, it doesn't register the
-marketplace for you, so that step can't be automated away (see
-[Relationship to mattpocock/skills](#-relationship-to-mattpocockskills)).
+There are no cross-marketplace dependencies to register first — as of v0.7.0
+the bundle is self-contained (see
+[Inspired by mattpocock/skills](#-inspired-by-mattpocockskills)).
 
 To make a skill manual-only so Claude never auto-triggers it, add
 `disable-model-invocation: true` to its frontmatter. It stays callable as
@@ -166,6 +161,13 @@ To make a project auto-prompt teammates to install it, add to that project's
 | `bootsplash` | Launch screen across all three surfaces (iOS storyboard, Android night resources, JS overlay), including dark variants without `react-native-bootsplash`'s paid license key. Carries the `bootsplash-dark.mjs` that generates them. |
 | `xcode-cloud` | Xcode Cloud CI for an RN app: the `ci_post_clone.sh` / `ci_pre_xcodebuild.sh` templates, workflow and TestFlight prerequisites, and a symptom-indexed failure catalogue. Self-documenting — every newly diagnosed failure is routed back into the catalogue or the project's own doc. |
 
+**🧠 Thinking**
+
+| Skill | What it does |
+| ----- | ------------ |
+| `grill-plan` | Interrogates a plan before it becomes code — one question per turn, each with a recommended answer, facts looked up rather than asked, one-way doors given the most time. |
+| `domain-model` | Owns the `CONTEXT.md` glossary and `docs/adr/` decision records: challenges fuzzy terms, breaks definitions with scenarios, and writes them down mid-session. |
+
 **🔁 Workflow**
 
 | Skill | What it does |
@@ -185,33 +187,46 @@ codebase orientation map, a sync/merge guardrail, an in-app-purchase
 guardrail). Those belong in that project's `.claude/skills/`.
 `maintain-skills` describes the promotion test for deciding which is which.
 
-## 🤝 Relationship to mattpocock/skills
+## 🤝 Inspired by mattpocock/skills
 
-`adora` declares a real dependency on
-[`mattpocock/skills`](https://github.com/mattpocock/skills), so installing
-`adora` also installs and enables `mattpocock-skills`:
+`grill-plan` and `domain-model` exist because
+[`mattpocock/skills`](https://github.com/mattpocock/skills) got the idea right
+first. Its `grilling` skill — interview relentlessly, one question at a time,
+always with a recommended answer, look facts up instead of asking — is the
+shape both of these are built on, and `domain-modeling` is where the
+`CONTEXT.md`-plus-ADR discipline comes from. Credit where it's due.
 
-```json
-// marketplace.json
-"allowCrossMarketplaceDependenciesOn": ["mattpocock"],
-"plugins": [{ "dependencies": ["mattpocock-skills@mattpocock"] }]
+Up to v0.6.1 `adora` declared a real plugin dependency on it, and
+`ticket-shaping` and `implement-ticket` called `grilling` / `grill-with-docs`
+by name. **v0.7.0 drops that dependency**: installing `adora` is now one
+command, nothing cross-marketplace has to be registered first, and the two
+skills are ours to sharpen against the failure modes we actually hit.
+
+What changed in the rewrite:
+
+- **Two skills, not four.** `grill-with-docs` was a two-line wrapper composing
+  the other two; here it is a *Capture as you go* section of `grill-plan`, and
+  `grill-me` was a slash-command alias. `domain-model` stays separate because
+  `add-feature`, `ios-widget`, and `maintain-skills` all need the doc
+  discipline *without* an interview.
+- **Renamed on purpose** — `grill-plan` / `domain-model`, so nothing collides
+  if you install both marketplaces. Two skills with the same name put two
+  descriptions in front of the model competing for one trigger, and the worse
+  one sometimes wins.
+- **Traps encoded**, per this repo's house style: what "whatever you think"
+  means on a one-way door versus a reversible detail, why capturing decisions
+  at the end of a session loses the reasoning, why an ADR directory full of
+  non-decisions trains people to stop reading it.
+
+That plugin is still worth installing alongside this one. It also ships
+`code-review`, `diagnosing-bugs`, `tdd`, `wayfinder`, `implement`, `to-spec`,
+and `to-tickets` — generic counterparts to some of the React Native-specific
+skills here. Where they overlap, those are the language-agnostic version and
+these encode the house conventions.
+
+```bash
+/plugin marketplace add mattpocock/skills
 ```
-
-The `allowCrossMarketplaceDependenciesOn` allowlist is required because that
-plugin lives in a different marketplace (`mattpocock`, not `adora-skills`).
-The version constraint is `*` — you track its latest on each
-`/plugin marketplace update`.
-
-**This is why `grilling`, `grill-me`, `grill-with-docs`, and `domain-modeling`
-are not in this repo.** Vendoring copies would put two descriptions in front of
-the model competing for the same trigger. Several skills here call into those
-by name (`ticket-shaping` and `implement-ticket` both invoke
-`grill-with-docs`).
-
-That plugin also ships `code-review`, `diagnosing-bugs`, `tdd`, `wayfinder`,
-`implement`, `to-spec`, and `to-tickets` — generic counterparts to some of the
-React Native-specific skills here. Where they overlap, those are the
-language-agnostic version and these encode the house conventions.
 
 ## 🏗️ Repo layout
 
@@ -225,7 +240,9 @@ language-agnostic version and these encode the house conventions.
     ├── bootsplash/         # + references/bootsplash-dark.mjs
     ├── build-ui/SKILL.md
     ├── commit-changes/SKILL.md
+    ├── domain-model/       # + references/{context,adr}-format.md
     ├── gitmoji/            # + references/gitmoji.json
+    ├── grill-plan/SKILL.md
     ├── implement-ticket/SKILL.md
     ├── ios-widget/         # + references/add-widget-target.rb
     ├── maintain-skills/SKILL.md
@@ -353,9 +370,10 @@ shapes immediately.
 
 > ⚠️ **Security.** There have been demonstrated supply-chain attacks where a
 > skill from an untrusted marketplace silently redirects dependency installs.
-> Only pull from sources you trust. `adora` tracks `mattpocock-skills` at `*`
-> (latest) — a deliberate trade of review-before-adopt for staying current. Pin
-> a `sha` on a re-listed entry if you'd rather review each update.
+> Only pull from sources you trust. `adora` declares no dependencies as of
+> v0.7.0, so nothing else is installed on your behalf. If you add one, pin a
+> `sha` on a re-listed entry unless you'd rather track latest and review
+> nothing.
 
 ## 📚 Docs
 
