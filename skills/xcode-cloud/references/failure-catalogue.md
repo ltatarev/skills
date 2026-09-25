@@ -311,6 +311,58 @@ Reach for `xcresulttool` whenever the text log looks entirely green. It is also
 the fastest way to read *any* archive failure: it lists `errorCount` and every
 issue as JSON instead of leaving you to grep eight megabytes.
 
+## `The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 15.0 to 27.0.x`
+
+```
+RNSVG-RNSVGFilters
+The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 12.4, but the
+range of supported deployment target versions is 15.0 to 27.0.x.
+```
+
+**Read the target names.** They are not the pods. They are the resource bundle
+targets of the pods: `<Pod>-<Pod>PrivacyInfo`, `RNSVG-RNSVGFilters`,
+`Sentry-Sentry`, `RNCAsyncStorage-RNCAsyncStorage_resources`. The value in each
+message comes from that pod's podspec, which is often 9.0 or 12.4.
+
+Xcode 27 supports deployment targets from 15.0 only, and a lower value is an
+**error**. Xcode 26 gave the same message as a warning. The failure starts when
+the build image moves to Xcode 27, with no change in the repo.
+
+`react_native_post_install` does not fix it. Its `updateOSDeploymentTarget`
+(`react-native/scripts/cocoapods/utils.rb`, RN 0.85) raises only
+`target_installation_result.native_target`, the main target of each pod. The
+resource bundle targets keep the podspec value.
+
+**Fix:** in the `Podfile` `post_install`, after `react_native_post_install`,
+raise every configuration of every target in `installer.pods_project`:
+
+```ruby
+installer.pods_project.targets.each do |target|
+  target.build_configurations.each do |config|
+    # Xcode 27 rejects deployment targets below 15.0. React Native raises only
+    # the main pod targets, so raise resource bundle targets here too.
+    version = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+    if version.nil? ||
+       Gem::Version.new(version) < Gem::Version.new(min_ios_version_supported)
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_ios_version_supported
+    end
+  end
+end
+```
+
+Check after a local `pod install`. Expect one line only, the value of
+`min_ios_version_supported`:
+
+```bash
+grep -o "IPHONEOS_DEPLOYMENT_TARGET = [^;]*" ios/Pods/Pods.xcodeproj/project.pbxproj \
+  | sort | uniq -c
+```
+
+A local Xcode 26 archive does not show the error, so **a green local archive
+does not clear it**. Only the next cloud build does.
+
+_Seen 25.09.2026 · RN 0.85.3 · fixed in the Lumee `Podfile`, cloud build green._
+
 ## `-ld64` / `-ld_classic` deprecation warnings
 
 `-ld64` in `OTHER_LDFLAGS` selects the classic linker and draws
