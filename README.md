@@ -2,7 +2,7 @@
 
 # 💖 adora-skills
 
-![skills](https://img.shields.io/badge/skills-17-ff69b4?style=flat-square)
+![skills](https://img.shields.io/badge/skills-18-ff69b4?style=flat-square)
 ![version](https://img.shields.io/badge/version-0.7.0-c084fc?style=flat-square)
 ![claude code](https://img.shields.io/badge/Claude%20Code-plugin-d97757?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-64748b?style=flat-square)
@@ -159,6 +159,7 @@ To make a project auto-prompt teammates to install it, add to that project's
 | ----- | ------------ |
 | `ios-widget` | WidgetKit extensions: the App Group snapshot architecture, scripting the extension target into `project.pbxproj`, the Swift bridge, offscreen Skia rendering, dark mode, and the build-verification traps. Carries a parameterized `add-widget-target.rb`. |
 | `bootsplash` | Launch screen across all three surfaces (iOS storyboard, Android night resources, JS overlay), including dark variants without `react-native-bootsplash`'s paid license key. Carries the `bootsplash-dark.mjs` that generates them. |
+| `upgrade-react-native` | Plans and carries out an RN version upgrade: release notes and the real `rn-diff-purge` diff, blocking peer ranges, the SceneDelegate start, stale prebuilt pods, the Yarn age gate, and a two-platform verification. |
 | `xcode-cloud` | Xcode Cloud CI for an RN app: the `ci_post_clone.sh` / `ci_pre_xcodebuild.sh` templates, workflow and TestFlight prerequisites, and a symptom-indexed failure catalogue. Self-documenting — every newly diagnosed failure is routed back into the catalogue or the project's own doc. |
 
 **🧠 Thinking**
