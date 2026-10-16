@@ -20,6 +20,16 @@ procedure for actually driving the app and observing it.
 npx react-native run-ios --simulator='iPhone 17 Pro Max'
 ```
 
+If two simulators have the same name (for example one per iOS runtime), the
+name is ambiguous, and `xcodebuild -destination 'name=…'` fails with
+`Unable to find a device matching the provided destination specifier`. Use the
+id instead:
+
+```sh
+xcrun simctl list devices available | grep 'iPhone 17 Pro Max'
+npx react-native run-ios --udid=<UDID>
+```
+
 Cold builds take a few minutes (longer on a fresh pod install). After a
 **JS-only** change no rebuild is needed — Metro serves a fresh bundle on
 relaunch:
