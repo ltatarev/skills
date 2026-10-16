@@ -252,6 +252,24 @@ entire dependency graph instead of installing what is locked.
 bundle lock --add-platform x86_64-darwin
 ```
 
+## `bundle install` changes `CFPropertyList` 3.0.9 to 3.0.8
+
+`CFPropertyList` (via `xcodeproj`, via `cocoapods`) 3.0.9 declares
+`required_ruby_version < 3.2`. On Ruby 3.2 or later, Bundler cannot use it, so
+a non-frozen `bundle install` writes 3.0.8 back into `Gemfile.lock`. Dependabot
+makes the same change, and it is **correct** — do not "fix" it back to 3.0.9.
+A frozen install (`BUNDLE_FROZEN` / `--deployment`) of a lockfile with 3.0.9
+cannot succeed on that Ruby. The builders' Homebrew Ruby is newer than 3.2.
+
+Check any gem's Ruby range before you argue with Bundler:
+
+```sh
+curl -s https://rubygems.org/api/v2/rubygems/CFPropertyList/versions/3.0.9.json \
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['ruby_version'])"
+```
+
+_Seen 16.10.2026 · Ruby 4.0.6 · cocoapods 1.17.0._
+
 ## Exit 65 with no `error:` anywhere in the log
 
 Every target reads green, `grep` for `ld: error`, `Undefined symbols`,
@@ -363,10 +381,58 @@ does not clear it**. Only the next cloud build does.
 
 _Seen 25.09.2026 · RN 0.85.3 · fixed in the Lumee `Podfile`, cloud build green._
 
-## `-ld64` / `-ld_classic` deprecation warnings
+**The app target can fail the same way.** A project created from an old
+template can still have `IPHONEOS_DEPLOYMENT_TARGET = 12.4` on the app target
+(the message then names `from project '<App>'`, not `'Pods'`). The Podfile fix
+does not touch it. Set it to `min_ios_version_supported` in both app
+configurations of `project.pbxproj` — Phase 2 of the skill.
 
-`-ld64` in `OTHER_LDFLAGS` selects the classic linker and draws
-`ld: warning: -ld_classic is deprecated and will be removed in a future
+_Seen 16.10.2026 · Xcode 27.1 · RN 0.88.0 · app target at 12.4._
+
+## `extra argument 'connectionOptions' in call` after a React Native upgrade
+
+```
+SceneDelegate.swift: error: extra argument 'connectionOptions' in call
+SceneDelegate.swift: error: type 'RCTLinkingManager' has no member 'scene'
+```
+
+Any Swift error on an API that the **new** RN version adds has the same cause:
+the build compiles against the **old** prebuilt core. `Podfile.lock` pins
+`React-Core-prebuilt` and `ReactNativeDependencies` by version, and
+`pod install` after the `package.json` bump can keep the old ones. Check:
+
+```sh
+grep -E '  - (React-Core-prebuilt|ReactNativeDependencies) \(' ios/Podfile.lock
+```
+
+**Fix**, then commit the new `Podfile.lock`:
+
+```sh
+cd ios && bundle exec pod update React-Core-prebuilt ReactNativeDependencies --no-repo-update
+```
+
+If the old lockfile reaches the cloud, the archive fails with the same errors.
+The `upgrade-react-native` skill has the full upgrade procedure.
+
+_Seen 16.10.2026 · RN 0.87.0 → 0.88.0 · local build._
+
+## `ld: library 'd64' not found` / `-ld64` / `-ld_classic` deprecation warnings
+
+```
+ld: library 'd64' not found
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+```
+
+**On Xcode 27 this is a hard link error.** The Xcode 27 driver no longer
+treats `-ld64` as a linker selection. It reads it as `-l d64`, "link the
+library `d64`", and the app target fails to link. Look for `-ld64` in the
+link command, between `-lc++` and `-Xlinker -alias`. Remove the entry from both
+`OTHER_LDFLAGS` blocks of the app target in `project.pbxproj`.
+
+_Seen 16.10.2026 · Xcode 27.1 · RN 0.88.0 · local simulator build._
+
+On older Xcodes, `-ld64` in `OTHER_LDFLAGS` selects the classic linker and
+draws `ld: warning: -ld_classic is deprecated and will be removed in a future
 release` — a contributor to the volume problem above.
 
 It was never yours and is no longer React Native's. Xcode 15 shipped a new
