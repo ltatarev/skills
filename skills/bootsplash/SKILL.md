@@ -5,9 +5,11 @@ description: >
   react-native-bootsplash, including light and dark variants without the paid
   license key. Use when the user asks about the splash screen, launch screen,
   bootsplash, app startup flash, a logo that is wrong or stale on launch, or a
-  splash that stays light in dark mode; when regenerating splash assets; or
-  before touching BootSplash.storyboard, values-night/, drawable-night-*/, or
-  the bootsplash asset catalogs.
+  splash that stays light in dark mode; when regenerating splash assets; when
+  the splash is missing or flashes after moving the iOS start to a
+  SceneDelegate; or before touching BootSplash.storyboard, values-night/,
+  drawable-night-*/, the bootsplash asset catalogs, or the customize(_:)
+  override in AppDelegate.swift / SceneDelegate.swift.
 ---
 
 # Launch screen / bootsplash
@@ -100,6 +102,33 @@ qualifier system picks these up; `styles.xml` needs no change.
 `darkLogo: require('assets/bootsplash/logo-dark.png')` — that require is the one
 bit that is **not** generated, so don't remove it.
 
+## Native wiring on iOS
+
+The storyboard is only the launch screen. The splash stays over the first frame
+because `RNBootSplash.initWithStoryboard` attaches it to the React root view, in
+the `customize(_:)` override of the class that is the React Native factory
+delegate. Which class that is depends on how the app starts:
+
+| App starts from | `customize(_:)` lives in |
+| --- | --- |
+| `SceneDelegate` (RN 0.88+ template) | `SceneDelegate`, which subclasses `RCTDefaultReactNativeFactoryDelegate` |
+| `AppDelegate` (older template) | the `ReactNativeDelegate` class next to `AppDelegate` |
+
+The override is the same in both (from the library's example app,
+`example/ios/RNBootSplashExample/SceneDelegate.swift`):
+
+```swift
+override func customize(_ rootView: RCTRootView) {
+  super.customize(rootView)
+  RNBootSplash.initWithStoryboard("BootSplash", rootView: rootView)
+}
+```
+
+When you move an app from the `AppDelegate` start to a `SceneDelegate` (see
+`upgrade-react-native`), move this override with it and add
+`import RNBootSplash`. If the call is lost, the build stays green, so check for
+it by grep, not by build: nothing attaches the splash to the root view any more.
+
 ## Verifying iOS
 
 A malformed `Contents.json` is **silently ignored** by `actool` — you would ship
@@ -161,3 +190,5 @@ looks right in `drawable-*/` but wrong in a build, check for leftovers in
 - [ ] Both appearances checked after a delete-and-reinstall, on iOS and Android.
 - [ ] No flash at handoff — splash background matches the first screen in both themes.
 - [ ] No stale `mipmap-*/bootsplash_logo.png` left behind.
+- [ ] `initWithStoryboard` is in the `customize(_:)` of the class that starts
+      React Native (`SceneDelegate` or `ReactNativeDelegate`).
