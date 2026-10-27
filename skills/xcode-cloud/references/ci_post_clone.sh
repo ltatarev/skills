@@ -72,9 +72,16 @@ echo "--- React Native prebuilt tarballs"
 # hit then skips the download. A corrupt/partial prefetch just fails RN's SHA
 # check and falls back to the old behaviour, never worse.
 #
-# Only applies to RN versions that ship prebuilt artifacts (0.86+). On an older
-# RN the URLs 404, the loop reports each failure and moves on, and pod install
-# builds from source as it always did — so this block is safe to leave in.
+# TEMPLATE — this block as written is correct for RN 0.86+ only, and below that
+# it fails silently rather than loudly. Check the RN version before trusting it;
+# see "The tarball prefetch runs clean, and pod install downloads them all
+# again" in failure-catalogue.md for the two reasons and the fix.
+#
+# In short, on RN 0.85 and below: the cache is <ios>/Pods/<Name>-artifacts/, not
+# the shared $HOME one below, and core/dependencies only download at all when
+# RCT_USE_PREBUILT_RNCORE=1 / RCT_USE_RN_DEP=1. The URLs still return 200, so the
+# prefetch reports six successes and protects nothing. Hermes, further down, is
+# the one fetch that is live on every version.
 RN_VERSION="$(node -p "require('react-native/package.json').version")"
 RN_CACHE_DIR="$HOME/Library/Caches/ReactNative"
 RN_MAVEN="${ENTERPRISE_REPOSITORY:-https://repo1.maven.org/maven2}"

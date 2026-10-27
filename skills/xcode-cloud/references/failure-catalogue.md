@@ -166,6 +166,59 @@ file rather than hardcoding — on RN 0.86.0 the two are `250829098.0.14` and
 `0.17.0`, and only the first appears in the URL. Prefetching is safe: a cached
 tarball that fails RN's SHA1 check is deleted and re-downloaded, not fatal.
 
+## The tarball prefetch runs clean, and `pod install` downloads them all again
+
+No error, nothing to grep. The prefetch block reports six successful downloads,
+and then `pod install` announces `Cache miss` for the same artifacts and fetches
+them itself — with the unprotected curl the prefetch existed to avoid. The
+resilience layer is doing nothing at all, and the only way you find out is a
+reset that kills the archive anyway.
+
+**Below RN 0.86, the prefetch above is aimed at the wrong directory and half of
+it is aimed at downloads that never happen.** Two independent differences, both
+version-dependent, and neither announces itself:
+
+**1. The cache is under `Pods/`, not `$HOME`.** On RN 0.85, `artifacts_dir()` in
+all three scripts resolves to `Pod::Config.instance.project_pods_root`:
+
+| Script | RN 0.85 cache directory |
+| --- | --- |
+| `rndependencies.rb` | `<ios>/Pods/ReactNativeDependencies-artifacts/` |
+| `rncore.rb` | `<ios>/Pods/ReactNativeCore-artifacts/` |
+| `sdks/hermes-engine/hermes-utils.rb` | `<ios>/Pods/hermes-engine-artifacts/` |
+
+The shared `~/Library/Caches/ReactNative` location is newer. Seeding the `Pods/`
+path from post-clone works — it runs before `pod install`, and CocoaPods only
+prunes its own pod target directories, so a hand-created sibling survives. Check
+`artifacts_dir()` in the installed copy rather than assuming either layout:
+
+```sh
+grep -A3 "def self.artifacts_dir\|^def artifacts_dir" \
+  node_modules/react-native/scripts/cocoapods/{rncore,rndependencies}.rb \
+  node_modules/react-native/sdks/hermes-engine/hermes-utils.rb
+```
+
+**2. Core and dependencies are opt-in, Hermes is not.** On 0.85 both
+`setup_rncore` and `setup_react_native_dependencies` gate the Maven lookup on an
+environment variable:
+
+```ruby
+artifacts_exists = ENV["RCT_USE_PREBUILT_RNCORE"] == "1" && (...)   # rncore.rb
+artifacts_exists = ENV["RCT_USE_RN_DEP"] == "1" && (...)            # rndependencies.rb
+```
+
+Unset, both fall back to `build_from_source` and download nothing — so four of
+the six prefetches are dead weight on a stock 0.85 project. Hermes has no such
+flag: `hermes_source_type()` falls through to `DOWNLOAD_PREBUILD_RELEASE_TARBALL`
+whenever the Maven artifact exists and none of `REACT_NATIVE_OVERRIDE_HERMES_DIR`
+/ `HERMES_ENGINE_TARBALL_PATH` / `BUILD_FROM_SOURCE` is set. **On 0.85 Hermes is
+the only live download, and it is the whole reason to keep the block.**
+
+RN 0.86 turns the other two on by default, which is what makes this look like it
+has always worked. Gate the core/dependencies prefetch on the same two variables
+rather than deleting it — then the block is correct on both sides of the bump,
+and it logs that it skipped instead of lying about protecting something.
+
 ## `Couldn't determine repo type for URL: https://cdn.cocoapods.org/`
 
 ```
