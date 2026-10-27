@@ -574,6 +574,39 @@ Keep stamping `$CI_BUILD_NUMBER` in `ci_pre_xcodebuild.sh` anyway: it is what
 keeps a *local* or manual archive off the template's hardcoded `1`. Just do not
 expect it to control TestFlight, and do not build repo-side logic on top of it.
 
+## "Preparing build for App Store Connect failed", and no log has an error
+
+The archive is green. All three exports (`app-store`, `ad-hoc`, `development`)
+end in `** EXPORT SUCCEEDED **`. Then the last step, **Prepare Build for App
+Store Connect**, fails with that one line and no other text. The downloaded
+logs bundle has no `error:` line anywhere, because it stops at the export. The
+upload and Apple's check of the build come after the export, so their log is not
+in the bundle.
+
+**The usual cause is a closed version.** When a version is released on the App
+Store, App Store Connect closes that `MARKETING_VERSION` to new builds. The RN
+template sets `1.0`, so the first push after the first release fails this way.
+The build number cannot help: a closed version refuses every build number.
+
+The misleading parts:
+
+- The export logs make the signing look good, and the signing *is* good. Do not
+  debug profiles or the App Group.
+- `IDEDistribution.critical.log` shows `Unable to authenticate with App Store
+  Connect` and `Failed to find an account with App Store Connect access`. Both
+  lines are in a successful export too. They are not the cause.
+- The build number is stamped correctly. The build number is not the cause.
+
+Apple sends the real reason only by email to the account holder ("There's an
+issue with your build", `ITMS-9xxxx`, "train version '1.0' is closed"). Read
+that email before you form a theory. If it is not available, ask whether the
+current marketing version is already live.
+
+Fix: set `MARKETING_VERSION` to the next version in every configuration of every
+target (the app and each extension), then push. Change it again each time a
+version goes live, before the next push to the release branch. Observed on RN
+0.86, Xcode 27, 2026-09-28: `1.0` refused, `1.0.1` reached TestFlight.
+
 ## Every build lands in "Missing Compliance"
 
 Declare `ITSAppUsesNonExemptEncryption` in the app's `Info.plist`. Without it,
