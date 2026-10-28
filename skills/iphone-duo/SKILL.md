@@ -171,6 +171,16 @@ not equal.
   removed from one side only.
 - Foreground content stays inside the safe area. Backgrounds extend past it.
   This is the `side-insets` rule.
+- Pad a full-screen modal inside its own screen container, not in the shared
+  modal wrapper. The container paints the background, so padding there keeps
+  the background at the edge. Padding on the wrapper leaves a strip with no
+  background under the status bar column.
+- If the repo uses Unistyles, read `rt.insets.left` and `rt.insets.right` in
+  `StyleSheet.create((theme, rt) => …)`. The style then follows a fold
+  without a hook.
+- When two places compute the same size from the window (for example a board
+  that one view draws and another view uses for an animation target), remove
+  the insets in both. If you change only one, the two sizes do not agree.
 - A custom bar that sits at the edge must not cover system UI. iOS 27.1 adds
   `UIViewReservedRegion` for this. React Native has no API for it, and
   `react-native-safe-area-context` does not report it. Keep custom bars inside
@@ -234,7 +244,7 @@ Test this matrix. Take a screenshot of each cell:
 | Closed, portrait | Same as a regular phone. Content clear of the status bar column. |
 | Closed, landscape | Side insets on both sides. Rows run edge to edge. |
 | Open, portrait and landscape | Regular layout: columns, sidebar or rail, capped text. |
-| Open, Split View on the left, then on the right | Drag the app by the home indicator. Compact layout in the narrow window. Vertical bars can be on either side. |
+| Open, Split View on the left, then on the right | Drag the app by the home indicator. Compact layout in the narrow window. The status bar column is on the right edge of the device, so only the app in the right half gets a side inset. Test both halves. |
 | Fold and unfold mid-use | State from section 8 stays. Carousel keeps its page. |
 
 `xcrun simctl io <udid> screenshot` captures the outer display only. When the
