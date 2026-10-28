@@ -237,6 +237,11 @@ Test this matrix. Take a screenshot of each cell:
 | Open, Split View on the left, then on the right | Drag the app by the home indicator. Compact layout in the narrow window. Vertical bars can be on either side. |
 | Fold and unfold mid-use | State from section 8 stays. Carousel keeps its page. |
 
+`xcrun simctl io <udid> screenshot` captures the outer display only. When the
+device is open, it writes a black image. Capture the Device Hub window
+instead. Find its window number with `CGWindowListCopyWindowInfo` (owner
+"Device Hub"), then run `screencapture -x -o -l <window-number> out.png`.
+
 Also resize an iPhone Mirroring window on macOS 27 to extreme sizes, in both
 directions. It shows layouts that the fixed poses do not.
 
