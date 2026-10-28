@@ -3,7 +3,7 @@
 # 💖 adora-skills
 
 ![skills](https://img.shields.io/badge/skills-19-ff69b4?style=flat-square)
-![version](https://img.shields.io/badge/version-0.8.0-c084fc?style=flat-square)
+![version](https://img.shields.io/badge/version-0.9.0-c084fc?style=flat-square)
 ![claude code](https://img.shields.io/badge/Claude%20Code-plugin-d97757?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-64748b?style=flat-square)
 
