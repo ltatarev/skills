@@ -221,6 +221,12 @@ Its on-screen buttons open, close, rotate and fold the device. There is no
 command-line fold control, so ask the user to change the pose when you
 cannot click.
 
+Measured on the Xcode 27.1 simulator, closed and upright: the window is
+466 × 678 pt at 3x, the insets are `top 0, right 84, bottom 34, left 0`. The
+status bar column is on the right, so a top inset of 0 is correct there. Read
+the values again on your own build, because a pose or an OS update can change
+them.
+
 Test this matrix. Take a screenshot of each cell:
 
 | Pose | Check |

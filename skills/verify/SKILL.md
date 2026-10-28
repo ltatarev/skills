@@ -72,8 +72,15 @@ A `Switch` needs a real press, not an instantaneous tap:
 
 ## Observing what the app did
 
-`console.log` and the app's logger go to **Metro**, not to the system log — so
-`xcrun simctl spawn booted log stream` will not show them.
+`console.log` and the app's logger do not go to the system log, so
+`xcrun simctl spawn booted log stream` does not show them. On older React Native
+versions they go to the Metro terminal. From about React Native 0.77, Metro
+does not show them; they go to React Native DevTools only.
+
+A probe that always works: render the value as a `Text` with a bright
+background, take a screenshot, then remove it. Put the probe in the view on
+top. A full-screen modal, such as onboarding, hides a probe in the screen
+under it.
 
 To capture runtime state in a screenshot, temporarily `Alert.alert(...)` the
 value from the code path under test, drive the flow, screenshot, then **remove
