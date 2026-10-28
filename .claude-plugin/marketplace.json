@@ -9,7 +9,7 @@
     {
       "name": "adora",
       "source": "./",
-      "description": "React Native development skills — UI and module scaffolding, unit tests, validation and simulator verification, side-inset layout for foldables, Unistyles and TrueSheet guides, iOS widgets, bootsplash, React Native upgrades and Xcode Cloud CI — plus plan grilling, domain modeling, gitmoji commits, splitting a messy tree into meaningful commits, ticket shaping, Linear ticket implementation, and skill-library upkeep.",
+      "description": "React Native development skills — UI and module scaffolding, unit tests, validation and simulator verification, side-inset and iPhone Duo layout, Unistyles and TrueSheet guides, iOS widgets, bootsplash, React Native upgrades and Xcode Cloud CI — plus plan grilling, domain modeling, gitmoji commits, splitting a messy tree into meaningful commits, ticket shaping, Linear ticket implementation, and skill-library upkeep.",
       "version": "0.9.0",
       "author": {
         "name": "ltatarev"

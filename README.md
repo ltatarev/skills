@@ -2,7 +2,7 @@
 
 # 💖 adora-skills
 
-![skills](https://img.shields.io/badge/skills-19-ff69b4?style=flat-square)
+![skills](https://img.shields.io/badge/skills-20-ff69b4?style=flat-square)
 ![version](https://img.shields.io/badge/version-0.9.0-c084fc?style=flat-square)
 ![claude code](https://img.shields.io/badge/Claude%20Code-plugin-d97757?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-64748b?style=flat-square)
@@ -151,6 +151,7 @@ To make a project auto-prompt teammates to install it, add to that project's
 | `validate-change` | Which checks match which change scope, how to baseline pre-existing failures, and the handoff report format. |
 | `verify` | Build, launch and drive the app on the iOS simulator with `idb` — and why synthetic clicks waste your afternoon. |
 | `side-insets` | Layout for a window with a left or right safe-area inset (a foldable, a landscape phone): full-bleed rows and backgrounds, a carousel paged by its own width, a short-window hero cap, and how to verify it. Carries `pxdiff.swift`. |
+| `iphone-duo` | Best UX on iPhone Duo: the audit for screen, orientation and device checks (JS and native), width classes, an iPad-like inner-display layout, vertical bars from the iOS 27.1 SDK, media fit, sheets, Split View, the pose test matrix, and the App Store screenshot rule. |
 | `unistyles` | `react-native-unistyles` guide, with the full v3 docs vendored offline in `references/`. |
 | `truesheet-usage` | Consumer guide for `@lodev09/react-native-true-sheet` bottom sheets. |
 
@@ -247,10 +248,13 @@ these encode the house conventions.
     ├── grill-plan/SKILL.md
     ├── implement-ticket/SKILL.md
     ├── ios-widget/         # + references/add-widget-target.rb
+    ├── iphone-duo/SKILL.md
     ├── maintain-skills/SKILL.md
+    ├── side-insets/        # + references/pxdiff.swift
     ├── ticket-shaping/SKILL.md
     ├── truesheet-usage/    # + references/*.md
     ├── unistyles/          # + references/unistyles.md (full offline docs)
+    ├── upgrade-react-native/SKILL.md
     ├── validate-change/SKILL.md
     ├── verify/SKILL.md
     ├── write-tests/SKILL.md
