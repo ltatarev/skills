@@ -57,6 +57,20 @@ A module-level `Dimensions.get` cannot follow a size change. A device check is
 the wrong question: the layout depends on the window, not the device. Do not
 add either one.
 
+Also grep for orientation logic. On iPhone Duo the inner display does not
+honor the supported orientations, so orientation does not give the shape of
+the window. Use `width > height` from the window or from `onLayout`:
+
+```sh
+grep -rn "orientation\|Orientation\|isLandscape\|isPortrait" src/
+```
+
+The insets on the left and the right are not equal. Read each side
+separately. Never use one value for both sides.
+
+For the rest of the iPhone Duo work (width classes, the inner-display layout,
+vertical system bars, native screen reads), load the `iphone-duo` skill.
+
 ## Phase 2 — the pattern
 
 ### 1. Let the wrapper say what it pads
@@ -190,8 +204,9 @@ one, and on a regular phone.
 
 Traps found on Xcode 27.1:
 
-- `simctl` has no fold control. A foldable simulator needs the Simulator app's
-  menu, so the user must fold it by hand.
+- `simctl` has no fold control. Open the iPhone Duo simulator from Device Hub
+  in Xcode 27.1 or later. Its on-screen buttons open, close, rotate and fold
+  the device. If you cannot click them, ask the user to change the pose.
 - `idb ui tap` fails, because `SimulatorKit.framework` is no longer at the path
   `idb_companion` loads. A deep link that opens an "Open in …?" prompt then
   blocks the run, because nothing can tap it.
