@@ -29,26 +29,27 @@ This skill defines the commit message format to follow when creating git commits
 
 ## Choosing a gitmoji
 
-**Read [references/gitmoji.json](references/gitmoji.json) before writing the commit message.**
+**Read [references/gitmoji.tsv](references/gitmoji.tsv) one time per session.**
+Do not read it again for each commit.
 
-That file is the canonical list of gitmojis for this skill. Each entry has:
-
-| Field | Use |
-| :---- | :-- |
-| `emoji` | Put this character at the start of the first line |
-| `code` | Short name (e.g. `:sparkles:`) — do not use in the commit message |
-| `description` | **Primary field** — match the change type to pick the right emoji |
-| `name` | Alternate keyword for search (e.g. `sparkles`, `bug`) |
-| `semver` | Optional hint for version bumps — ignore unless the user asks |
+The file has one line per gitmoji: the emoji, a tab, and the description.
+It comes from `references/gitmoji.json`, the canonical list. Read the JSON only
+if you need the `code`, `name`, or `semver` field.
 
 ### Selection workflow
 
-1. Read the staged diff and summarize the change type.
-2. Open `references/gitmoji.json` and scan `description` values for the best match.
-3. If several fit, prefer the most specific one (e.g. `:ambulance:` over `:bug:` for a critical hotfix).
-4. Use the matched entry's `emoji` on the first line — not the `:code:` text.
+1. Use the diff that you already read to find the change type.
+2. Find the best match in the `description` column.
+3. If several fit, use the most specific one (for example 🚑️ over 🐛 for a critical hotfix).
+4. Put the emoji on the first line, not the `:code:` text.
 
-Do not rely on memory or the table below; always confirm against the JSON file.
+Do not rely on memory. Confirm the emoji against the list.
+
+If `gitmoji.json` changes, regenerate the list:
+
+```sh
+python3 -c "import json;print('# Generated from gitmoji.json. One gitmoji per line: emoji, then description.');[print(g['emoji']+'\t'+g['description']) for g in json.load(open('gitmoji.json'))['gitmojis']]" > gitmoji.tsv
+```
 
 ## Splitting a mixed working tree
 

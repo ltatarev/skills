@@ -175,7 +175,7 @@ To make a project auto-prompt teammates to install it, add to that project's
 
 | Skill | What it does |
 | ----- | ------------ |
-| `gitmoji` | Gitmoji commit format, with the canonical emoji list in `references/gitmoji.json`. |
+| `gitmoji` | Gitmoji commit format, with the canonical emoji list in `references/gitmoji.json` and a compact copy in `references/gitmoji.tsv`. |
 | `commit-changes` | Splits a messy working tree into small, meaningful commits — grouping by concern, hunk-level staging without interactive `git add -p`, and what never gets swept in. |
 | `ticket-shaping` | Turns a fuzzy UX-level idea into an implementation-ready ticket, via a one-question-at-a-time interview plus a plan you argue with. Writes to whichever tracker the repo configured. |
 | `implement-ticket` | Implements a ticket end-to-end: fetch, grill the plan, implement, test, mark In Review. Tracker (Linear, Notion, or in-repo `docs/tickets/`) is picked once per repo and stored in `.claude/ticket-tracker.json`. |
